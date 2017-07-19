@@ -1,6 +1,12 @@
-from tkinter import *
-from tkinter import messagebox
-from tkinter import constants
+import sys
+if sys.version_info < (3, 0): # Python 2
+	from Tkinter import *
+	import tkMessageBox as messagebox
+else: # Python 3
+	from tkinter import *
+	from tkinter import messagebox
+	from tkinter import constants
+	
 from smtplib import *
 
 class Application(Frame):
@@ -20,7 +26,10 @@ class Application(Frame):
 	sendButton = Button
 
 	def __init__(self, master = Tk):
-		super().__init__(master, border = 15)
+		
+		if sys.version_info < (3, 0): Frame.__init__(self, master, border = 12)
+		else: super().__init__(master, border = 15)
+
 		self.pack(fill = BOTH, expand = True)
 		self.create_widgets()
 
