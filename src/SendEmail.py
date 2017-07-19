@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import constants
 from smtplib import *
 
 class Application(Frame):
@@ -77,7 +78,7 @@ class Application(Frame):
 			message = "To: {0}\nFrom: {1}\nSubject:{2}\n\n{3}".format(sender, receiver, subject, mailContent)
 
 			try:
-				smtpServer = SMTP("smtp.gmx.com", 587)
+				smtpServer = SMTP("smtp.gmx.com", 587) # You need to change this address
 				smtpServer.ehlo()
 				smtpServer.starttls()
 				smtpServer.ehlo()
