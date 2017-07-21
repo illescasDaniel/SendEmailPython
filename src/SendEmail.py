@@ -35,7 +35,7 @@ class Application(Frame):
 
 	def __init__(self, master = Tk):
 		
-		if sys.version_info < (3, 0): Frame.__init__(self, master, border = 12)
+		if sys.version_info < (3, 0): Frame.__init__(self, master, border = 15)
 		else: super().__init__(master, border = 15)
 
 		self.readSettings()
