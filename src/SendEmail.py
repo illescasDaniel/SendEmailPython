@@ -1,11 +1,13 @@
 import sys
 if sys.version_info < (3, 0): # Python 2
 	from Tkinter import *
+	from threading import *
 	import tkMessageBox as messagebox
 else: # Python 3
 	from tkinter import *
 	from tkinter import messagebox
 	from tkinter import constants
+	from threading import *
 	
 from smtplib import *
 
@@ -38,7 +40,7 @@ class Application(Frame):
 		if sys.version_info < (3, 0): Frame.__init__(self, master, border = 15)
 		else: super().__init__(master, border = 15)
 
-		self.readSettings()
+		self.__readSettings()
 		self.pack(fill = BOTH, expand = True)
 		self.create_widgets()
 
@@ -89,7 +91,7 @@ class Application(Frame):
 		self.receiverEntry = Entry(emailInfoLabelFrame)
 		self.receiverEntry.grid(row = 1, column = 1)
 
-		self.sendButton = Button(self, text ="Send", command = self.sendEmailAction, width = 10)
+		self.sendButton = Button(self, text = "Send", command = lambda: self.__sendEmailThread(), width = 10)
 		self.sendButton.pack(side = BOTTOM, fill = Y, expand = True)
 
 		self.emailContentBox = Text(self, width = 45, height = 8, borderwidth = 10, background = "#EEEEEE")
@@ -111,7 +113,7 @@ class Application(Frame):
 		if not sender or not password or not subject or not receiver or not mailContent or not serverAddress or not serverPort:
 			messagebox.showerror(title = "Error", message = "Some fields are empty")
 		else:
-			self.saveSettings(sender, serverAddress, serverPort)
+			self.__saveSettings(sender, serverAddress, serverPort)
 			message = "To: {0}\nFrom: {1}\nSubject:{2}\n\n{3}".format(sender, receiver, subject, mailContent)
 
 			try:
@@ -127,7 +129,12 @@ class Application(Frame):
 			except SMTPException:
 				messagebox.showerror(title = "Error", message = "Unable to send email")
 
-	def readSettings(self):
+	def __sendEmailThread(self):
+			sendEmailOnThread = Thread(target = self.sendEmailAction)
+			sendEmailOnThread.daemon = True
+			sendEmailOnThread.start()
+
+	def __readSettings(self):
 		with open("settings", "a+") as file:
 			file.seek(0)
 			self.savedSenderEmail = file.readline().strip("\n")
@@ -136,10 +143,10 @@ class Application(Frame):
 			file.truncate()
 			file.close()
 
-	def saveSettings(self, senderEmail, serverAddressToSave, serverPortToSave):
+	def __saveSettings(self, senderEmailToSave, serverAddressToSave, serverPortToSave):
 		with open("settings", "r+") as file:
 			file.seek(0)
-			file.write(senderEmail + "\n")
+			file.write(senderEmailToSave + "\n")
 			file.write(serverAddressToSave + "\n")
 			file.write(serverPortToSave)
 			file.truncate()
@@ -149,7 +156,6 @@ if __name__ == '__main__':
 
 	mainWindow = Tk()
 	mainWindow.title("Send Email")
-	mainWindow.config(background = "green")
 	app = Application(master = mainWindow)
 	mainWindow.update()
 	mainWindow.minsize(mainWindow.winfo_width(), mainWindow.winfo_height())

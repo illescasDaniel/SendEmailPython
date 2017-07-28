@@ -5,5 +5,6 @@ cleanBuild:
 clean:
 	@rm -rf build
 	@rm -rf dist
+	@rm -rf .eggs
 run:
 	open dist/SendEmail.app
